@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class ReservationMapper {
 
-    Logger logger = LoggerFactory.getLogger(ReservationMapper.class);
+    private final Logger logger = LoggerFactory.getLogger(ReservationMapper.class);
 
     public List<ReservationResponseDTO> mapListOfReservationToListOfReservationResponseDTO(List<Reservation> reservations) {
         logger.info("Inside ReservationMapper :: mapListOfReservationToListOfReservationResponseDTO");

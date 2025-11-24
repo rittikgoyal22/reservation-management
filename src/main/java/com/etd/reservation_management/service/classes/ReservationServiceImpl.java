@@ -69,7 +69,7 @@ import static com.etd.reservation_management.constant.AppConstant.UNDERSCORE;
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
-    Logger logger = LoggerFactory.getLogger(ReservationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(ReservationServiceImpl.class);
     private final ReservationTypeRepo reservationTypeRepo;
     private final TravelPlannerClient travelPlannerClient;
     private final ReservationRepo reservationRepo;
@@ -103,7 +103,7 @@ public class ReservationServiceImpl implements ReservationService {
         try{
             travelRequest = travelPlannerClient.getTravelRequestDetailByTravelRequestId(requestDTO.getTravelRequestId());
         }
-        catch(Exception e)
+        catch(Exception _)
         {
             throw new IllegalArgumentException(messageSource.getMessage(TRAVEL_REQUEST_NOT_FOUND, new Object[]{requestDTO.getTravelRequestId()}, Locale.ENGLISH), TRAVEL_REQUEST_ID);
         }
