@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReservationDocsMapper {
 
-    Logger logger = LoggerFactory.getLogger(ReservationDocsMapper.class);
+    private final Logger logger = LoggerFactory.getLogger(ReservationDocsMapper.class);
 
     public ReservationDocs mapReservationDocsByReservationAndDocPath(Reservation savedReservation, String uniqueFileName) {
         logger.info("Inside ReservationDocsMapper :: mapReservationDocsByReservationAndDocPath");
