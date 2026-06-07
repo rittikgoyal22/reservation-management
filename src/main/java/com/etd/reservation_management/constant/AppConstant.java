@@ -16,27 +16,32 @@ public class AppConstant {
     public static final String TRAVEL_REQUEST_NOT_FOUND = "travel.request.not.found";
     public static final String PDF_SIZE_EXCEED = "pdf.size.exceed";
     public static final String TRAVEL_REQUEST_NOT_APPROVED = "travel.request.not.approved";
+    public static final String APPROVED_BUDGET_NOT_CALCULATED = "approved.budget.not.calculated";
+    public static final String INVALID_PDF_FORMAT = "invalid.pdf.format";
+    public static final String AMOUNT_NOT_POSITIVE = "amount.not.positive";
 
-    //General Constants
+    // General Constants
     public static final String RESERVATION_ID = "Reservation Id";
     public static final String TRAVEL_REQUEST_ID = "Travel Request Id";
     public static final String STATIC = "static";
     public static final String UNDERSCORE = "_";
     public static final String AMOUNT = "amount";
     public static final String MODE_OF_TRAVEL = "mode of travel";
-    public static final String CAB = "cab";
-    public static final String HOTEL = "hotel";
+    public static final String FLIGHT = "Flight";
+    public static final String TRAIN = "Train";
+    public static final String BUS = "Bus";
+    public static final String CAB = "Cab";
+    public static final String HOTEL = "Hotel";
     public static final String FIFTEEN = "15";
     public static final String THIRTY_FIVE = "35";
     public static final String FIFTY = "50";
     public static final String RESERVATION = "Reservation";
     public static final String APPROVED_BUDGET = "approvedBudget";
-    public static final String TRAIN = "TRAIN";
-    public static final String BUS = "BUS";
     public static final String FROM_DATE = "fromDate";
     public static final String RESERVATION_TYPE_ID = "Reservation Type Id";
     public static final String REQUEST_ID = "requestId";
     public static final String REQUEST_STATUS = "requestStatus";
     public static final String APPROVED = "APPROVED";
+    public static final String PDF_FILE = "pdfFile";
 
 }

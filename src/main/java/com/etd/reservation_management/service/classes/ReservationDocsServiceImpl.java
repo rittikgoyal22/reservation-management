@@ -6,8 +6,8 @@ import com.etd.reservation_management.exception.NotFoundException;
 import com.etd.reservation_management.service.interfaces.ReservationDocsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -19,7 +19,6 @@ import java.util.Locale;
 
 import static com.etd.reservation_management.constant.AppConstant.DOCUMENT_NOT_FOUND;
 import static com.etd.reservation_management.constant.AppConstant.RESERVATION_ID;
-import static com.etd.reservation_management.constant.AppConstant.STATIC;
 
 @Service
 public class ReservationDocsServiceImpl implements ReservationDocsService {
@@ -27,10 +26,13 @@ public class ReservationDocsServiceImpl implements ReservationDocsService {
     private final Logger logger = LoggerFactory.getLogger(ReservationDocsServiceImpl.class);
     private final ReservationDocsRepo reservationDocsRepo;
     private final MessageSource messageSource;
+    private final String uploadDir;
 
-    public ReservationDocsServiceImpl(ReservationDocsRepo reservationDocsRepo, MessageSource messageSource) {
+    public ReservationDocsServiceImpl(ReservationDocsRepo reservationDocsRepo, MessageSource messageSource,
+                                      @Value("${app.upload.dir}") String uploadDir) {
         this.reservationDocsRepo = reservationDocsRepo;
         this.messageSource = messageSource;
+        this.uploadDir = uploadDir;
     }
 
     @Override
@@ -41,13 +43,6 @@ public class ReservationDocsServiceImpl implements ReservationDocsService {
         if (ObjectUtils.isEmpty(reservationDocs) || ObjectUtils.isEmpty(reservationDocs.getDocumentUrl())) {
             throw new NotFoundException(messageSource.getMessage(DOCUMENT_NOT_FOUND, new Object[]{reservationId}, Locale.ENGLISH), RESERVATION_ID);
         }
-        String uploadDir = "";
-        try {
-            uploadDir = new ClassPathResource(STATIC).getFile().getAbsolutePath();
-        } catch (IOException e) {
-            logger.error("Failed to save PDF file", e);
-        }
-
         Path path = Paths.get(uploadDir, reservationDocs.getDocumentUrl());
         try {
             return Files.readAllBytes(path);
