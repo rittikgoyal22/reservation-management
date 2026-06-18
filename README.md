@@ -31,8 +31,7 @@ Microservice responsible for managing travel reservations in the **Employee Trav
 | Framework | Spring Boot 3.5.7 |
 | Build tool | Gradle (no wrapper JAR committed — use system `gradle`) |
 | Persistence | Spring Data JPA + Hibernate |
-| Database (dev) | H2 file-mode |
-| Database (prod) | MySQL (commented out — see Configuration) |
+| Database | MySQL 8 (`com.mysql:mysql-connector-j`) |
 | Security | Spring Security 6 + stateless JWT (JJWT 0.12.6, HMAC-SHA256) |
 | HTTP clients | Spring Cloud OpenFeign |
 | API docs | Springdoc OpenAPI (Swagger UI) |
@@ -67,17 +66,18 @@ Microservice responsible for managing travel reservations in the **Employee Trav
 
 - Java 21
 - Gradle (system install)
-- account-management running (provides H2 TCP server on port 9092 — needed by auth-service)
+- MySQL 8 running on `localhost:3306` (the `reservation_management` database is auto-created on first connect)
+- account-management running (creates the shared `account_management` schema needed by auth-service)
 - auth-service running on port 8080
 - travel-planner running on port 8082
 
 ### Startup Order (important)
 
 ```
-1. account-management  → starts H2 TCP server (port 9092)
-2. auth-service        → connects to account-management's H2
-3. travel-planner      → independent H2 file DB
-4. reservation-management  → independent H2 file DB (this service)
+1. account-management  → creates shared account_management schema, seeds default users
+2. auth-service        → connects to the same account_management MySQL database
+3. travel-planner      → own MySQL database travel_planner
+4. reservation-management  → own MySQL database reservation_management (this service)
 ```
 
 ### Run
@@ -91,13 +91,6 @@ gradle bootRun
 ```bash
 gradle build
 ```
-
-### H2 Console (dev)
-
-URL: `http://localhost:8083/h2-console`
-- JDBC URL: `jdbc:h2:file:~/data/reservation_types`
-- Username: `sa`
-- Password: _(blank)_
 
 ### Swagger UI
 
@@ -114,19 +107,12 @@ All settings in `src/main/resources/application.properties`:
 server.port=8083
 spring.application.name=reservation-management
 
-# H2 Database (dev)
-spring.datasource.url=jdbc:h2:file:~/data/reservation_types;AUTO_SERVER=TRUE
-spring.datasource.driver-class-name=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.h2.console.enabled=true
-
-# MySQL Database (prod — uncomment and add mysql-connector-j to build.gradle)
-# spring.datasource.url=jdbc:mysql://localhost:3306/reservation_management
-# spring.datasource.username=root
-# spring.datasource.password=<your-password>
-# spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+# MySQL Database
+spring.datasource.url=jdbc:mysql://localhost:3306/reservation_management?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=<your-password>
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 
 # JPA
 spring.jpa.hibernate.ddl-auto=update
@@ -164,7 +150,7 @@ Service Interface → Service Impl
      ↓                     ↓
 Mapper               Feign Clients (travel-planner, auth-service)
      ↓
-JPA Repository → H2 / MySQL
+JPA Repository → MySQL
 ```
 
 ### Package Layout
@@ -280,7 +266,7 @@ Seeded reservation types in order:
 
 ### Authentication
 
-All endpoints except Swagger/H2 console require a valid JWT token in the `Authorization` header:
+All endpoints except Swagger require a valid JWT token in the `Authorization` header:
 ```
 Authorization: Bearer <token>
 ```
@@ -686,10 +672,6 @@ All outgoing Feign calls automatically carry the incoming `Authorization: Bearer
 ### No UserDetailsService
 
 Unlike account-management and travel-planner, this service does **not** query the employee database for authentication. The JWT `role` claim is trusted directly. This keeps the service stateless and independent.
-
-### H2 AUTO_SERVER
-
-`AUTO_SERVER=TRUE` in the H2 JDBC URL allows multiple JVM connections to the same H2 file database. This is necessary during development when both Hibernate and the H2 console access the file simultaneously.
 
 ### Type ID ordering is critical
 
